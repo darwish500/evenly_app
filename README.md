@@ -1,4 +1,4 @@
-# evently_app_c13_sun_7_pm
+# evently_app
 
 A new Flutter project.
 
