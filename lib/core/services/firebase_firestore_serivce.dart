@@ -60,7 +60,7 @@ class FirebaseFirestoreService {
     return collectionRef.snapshots();
   }
 
-  Future<bool> deleteEvent(EventDataModel data) async {
+  static Future<bool> deleteEvent(EventDataModel data) async {
     try {
       var collectionRef = getCollectionReference();
       var docRef = collectionRef.doc(data.eventID);

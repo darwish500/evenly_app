@@ -16,81 +16,116 @@ class EventCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
-    return Container(
-      height: 200,
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(color: ColorPalette.primaryColor, width: 1.4),
-        image: DecorationImage(
-          image: AssetImage(
-            eventDataModel.eventImage,
-          ),
-          fit: BoxFit.fitWidth,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 45,
-            alignment: Alignment.center,
-            padding: EdgeInsets.symmetric(vertical: 2),
-            // height: 49,
-            decoration: BoxDecoration(
-              color: ColorPalette.white,
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            child: Text(
-              DateFormat("dd MMM").format(eventDataModel.eventDate),
-              textAlign: TextAlign.center,
-              style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  color: ColorPalette.primaryColor),
-            ),
-          ),
-          const Spacer(),
-          Container(
-            width: double.infinity,
-            alignment: Alignment.center,
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-            // height: 49,
-            decoration: BoxDecoration(
-              color: ColorPalette.white,
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return GestureDetector(
+      onLongPress: () {
+        showModalBottomSheet(
+          context: context,
+          builder: (BuildContext context) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Expanded(
-                  child: Text(
-                    eventDataModel.eventTitle,
-                    textAlign: TextAlign.start,
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                ListTile(
+                  leading: Icon(Icons.edit, color: ColorPalette.primaryColor),
+                  title: Text('Edit Event', style: theme.textTheme.titleMedium),
+                  onTap: () {
+                    Navigator.pop(context); // Close the bottom sheet
+                    // TODO: navigate to the edit event page
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.delete, color: Colors.red),
+                  title:
+                      Text('Delete Event', style: theme.textTheme.titleMedium),
+                  onTap: () async {
+                    Navigator.pop(context); // Close the bottom sheet
+                    await FirebaseFirestoreService.deleteEvent(
+                        eventDataModel); // Assuming the model has an id
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Event deleted successfully!')),
+                    );
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+      child: Container(
+        height: 200,
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16.0),
+          border: Border.all(color: ColorPalette.primaryColor, width: 1.4),
+          image: DecorationImage(
+            image: AssetImage(
+              eventDataModel.eventImage,
+            ),
+            fit: BoxFit.fitWidth,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 45,
+              alignment: Alignment.center,
+              padding: EdgeInsets.symmetric(vertical: 2),
+              // height: 49,
+              decoration: BoxDecoration(
+                color: ColorPalette.white,
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: Text(
+                DateFormat("dd MMM").format(eventDataModel.eventDate),
+                textAlign: TextAlign.center,
+                style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: ColorPalette.primaryColor),
+              ),
+            ),
+            const Spacer(),
+            Container(
+              width: double.infinity,
+              alignment: Alignment.center,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              // height: 49,
+              decoration: BoxDecoration(
+                color: ColorPalette.white,
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      eventDataModel.eventTitle,
+                      textAlign: TextAlign.start,
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(width: 10),
-                GestureDetector(
-                  onTap: () {
-                    eventDataModel.isFavorite = !eventDataModel.isFavorite;
-                    FirebaseFirestoreService.updateEvent(eventDataModel);
-                  },
-                  child: Icon(
-                    eventDataModel.isFavorite
-                        ? Icons.favorite
-                        : Icons.favorite_border,
-                    color: ColorPalette.primaryColor,
-                  ),
-                )
-              ],
+                  SizedBox(width: 10),
+                  GestureDetector(
+                    onTap: () {
+                      eventDataModel.isFavorite = !eventDataModel.isFavorite;
+                      FirebaseFirestoreService.updateEvent(eventDataModel);
+                    },
+                    child: Icon(
+                      eventDataModel.isFavorite
+                          ? Icons.favorite
+                          : Icons.favorite_border,
+                      color: ColorPalette.primaryColor,
+                    ),
+                  )
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
